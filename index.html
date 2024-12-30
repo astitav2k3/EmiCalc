@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>EMI Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            /* display: flex;
+            flex-direction: column; */
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+        }
+
+        .container {
+            max-width: 500px;
+            /* Increased the max-width for a broader layout */
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            margin: 20px auto;
+        }
+
+
+        h1 {
+            margin: 0;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 10px;
+        }
+
+        input[type="number"] {
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* Additional styling for the loan tenure options */
+        .loan-tenure {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .loan-tenure select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .loan-tenure input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        #chartContainer {
+            max-width: 500px;
+            /* Increased the max-width for a broader layout */
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        #summary {
+            margin-top: 20px;
+        }
+
+        .footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+
+        /* Style for small screens (e.g., mobile phones) */
+        @media (max-width: 480px) {
+            .container {
+                max-width: 90%;
+                padding: 10px;
+                margin-top: 20%;
+            }
+
+            .loan-tenure label {
+                margin-bottom: 10px;
+            }
+
+            .loan-tenure select {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>EMI Calculator</h1>
+    </header>
+
+    <div class="container">
+        <form id="emiForm">
+            <label for="loanAmount">Loan Amount:</label>
+            <input type="number" id="loanAmount" required>
+
+            <label for="interestRate">Interest Rate (%):</label>
+            <input type="number" id="interestRate" step="0.01" required>
+
+            <div class="loan-tenure">
+                <label for="loanTenure">Loan Tenure:</label>
+                <select id="timePeriod">
+                    <option value="months">Months</option>
+                    <option value="years">Years</option>
+                </select>
+                <input type="number" id="loanTenure" placeholder="e.g., 5 years or 60 months" required>
+            </div>
+
+            <input type="submit" value="Calculate">
+        </form>
+
+        <div id="result">
+            <h2>EMI Result:</h2>
+            <p id="emiValue"></p>
+        </div>
+
+        <div id="summary">
+            <h2>Loan Summary</h2>
+            <p>Total Interest Paid: <span id="totalInterest"></span></p>
+            <p>Principal Amount: <span id="principalAmount"></span></p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2023 EMI Calculator</p>
+    </footer>
+
+    <script>
+        document.getElementById('emiForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+            const interestRate = parseFloat(document.getElementById('interestRate').value) / 100 / 12;
+            const loanTenure = parseInt(document.getElementById('loanTenure').value);
+            const timePeriod = document.getElementById('timePeriod').value;
+
+            const tenureInMonths = timePeriod === 'years' ? loanTenure * 12 : loanTenure;
+            const emi = calculateEMI(loanAmount, interestRate, tenureInMonths);
+            const totalPayment = emi * tenureInMonths;
+            const totalInterest = totalPayment - loanAmount;
+
+            displayEMIResult(emi);
+
+            // Display loan summary
+            document.getElementById('totalInterest').textContent = `₹ ${totalInterest.toFixed(2)}`;
+            document.getElementById('principalAmount').textContent = `₹ ${loanAmount.toFixed(2)}`;
+        });
+
+        function calculateEMI(principal, interest, tenure) {
+            const emi = (principal * interest * Math.pow(1 + interest, tenure)) / (Math.pow(1 + interest, tenure) - 1);
+            return emi.toFixed(2);
+        }
+
+        function displayEMIResult(emi) {
+            const emiValueElement = document.getElementById('emiValue');
+            emiValueElement.textContent = `₹ ${emi} per month`;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>
